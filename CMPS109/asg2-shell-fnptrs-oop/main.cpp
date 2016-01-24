@@ -48,6 +48,8 @@ int main (int argc, char** argv) {
    scan_options (argc, argv);
    bool need_echo = want_echo();
    inode_state state;
+   state.modify_dirent(state.getCwd(), ".");
+   state.modify_dirent(state.getCwd(), "..");
    try {
       for (;;) {
          try {
@@ -67,10 +69,7 @@ int main (int argc, char** argv) {
             // Split the line into words and lookup the appropriate
             // function.  Complain or call it.
             wordvec words = split (line, " \t");
-
-            cout << "word_range = " << word_range(words.begin(), words.end()) << 
-            "      words.size() = " << words.size() << endl;
-            
+            DEBUGF ('y', "words = " << words);
             command_fn fn = find_command_fn (words.at(0));
             fn (state, words);
          }catch (command_error& error) {

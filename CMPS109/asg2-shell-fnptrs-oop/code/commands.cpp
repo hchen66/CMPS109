@@ -84,6 +84,10 @@ void fn_mkdir (inode_state& state, const wordvec& words){
 void fn_prompt (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+   string result("");
+   for(auto itor = words.cbegin() + 1; itor != words.cend(); ++itor)   
+      result = result + *itor + " ";
+   state.setPrompt_(result);
 }
 
 void fn_pwd (inode_state& state, const wordvec& words){

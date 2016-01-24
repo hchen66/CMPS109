@@ -42,12 +42,17 @@ class inode_state {
    public:
       inode_state();
       const string& prompt();
-
+      void modify_dirent(const inode_ptr&, const string&);
+      size_t getSize(const inode_ptr&) const;
       inode_ptr getRoot();
       inode_ptr getCwd();
-      void setPrompt_(const string& newP);
-      void setCwd(const inode& ind);
-      void backToRoot();
+      map<string, inode_ptr>& getDirent();
+      void setCwd(const inode_ptr& that);
+      void setRoot(const inode_ptr& that);
+      inode_ptr peek_helper(string& s, const inode_ptr& node);
+      inode_ptr peek(string& that);
+      string getCwdName();
+      void setPrompt(const string& that);
 };
 
 // class inode -
@@ -72,6 +77,8 @@ class inode {
    public:
       inode (file_type);
       int get_inode_nr() const;
+      base_file_ptr& getContent();
+      map<string, inode_ptr>& getDirent();
 };
 
 
@@ -98,8 +105,12 @@ class base_file {
       virtual const wordvec& readfile() const = 0;
       virtual void writefile (const wordvec& newdata) = 0;
       virtual void remove (const string& filename) = 0;
-      virtual inode_ptr mkdir (const string& dirname) = 0;
+      virtual inode_ptr mkdir (const string& dirname, const inode_ptr& node) = 0;
       virtual inode_ptr mkfile (const string& filename) = 0;
+
+      virtual wordvec& getData() = 0;
+      virtual map<string, inode_ptr>& getDirent() = 0;
+      virtual bool isDirectory() const = 0;
 };
 
 
@@ -120,8 +131,12 @@ class plain_file: public base_file {
       virtual const wordvec& readfile() const override;
       virtual void writefile (const wordvec& newdata) override;
       virtual void remove (const string& filename) override;
-      virtual inode_ptr mkdir (const string& dirname) override;
+      virtual inode_ptr mkdir (const string& dirname, const inode_ptr& node) override;
       virtual inode_ptr mkfile (const string& filename) override;
+
+      virtual wordvec& getData() override;
+      virtual map<string, inode_ptr>& getDirent() override;
+      virtual bool isDirectory() const override;
 };
 
 // class directory -
@@ -151,10 +166,14 @@ class directory: public base_file {
       virtual const wordvec& readfile() const override;
       virtual void writefile (const wordvec& newdata) override;
       virtual void remove (const string& filename) override;
-      virtual inode_ptr mkdir (const string& dirname) override;
+      virtual inode_ptr mkdir (const string& dirname, const inode_ptr& node) override;
       virtual inode_ptr mkfile (const string& filename) override;
 
+      virtual wordvec& getData() override;
+      virtual map<string, inode_ptr>& getDirent() override;
+      virtual bool isDirectory() const override;
 
+      directory();
 };
 
 #endif

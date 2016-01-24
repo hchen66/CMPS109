@@ -11,7 +11,7 @@ using namespace std;
 
 int inode::next_inode_nr {1};
 
-struct file_type_hash {
+struct file_type_hash {                                                 //functor object to calculate hash of enum class
    size_t operator() (file_type type) const {
       return static_cast<size_t> (type);
    }
@@ -31,6 +31,23 @@ inode_state::inode_state() {
 }
 
 const string& inode_state::prompt() { return prompt_; }
+
+void inode_state::setPrompt_(const string& newP) {
+  prompt_ = newP;
+}
+
+inode_ptr inode_state::getCwd() {
+  return cwd;
+}
+
+inode_ptr inode_state::getRoot() {
+  return root;
+}
+
+void inode_state::backToRoot() {
+  cwd = root;
+}
+
 
 ostream& operator<< (ostream& out, const inode_state& state) {
    out << "inode_state: root = " << state.root
@@ -62,6 +79,7 @@ file_error::file_error (const string& what):
 
 size_t plain_file::size() const {
    size_t size {0};
+
    DEBUGF ('i', "size = " << size);
    return size;
 }
